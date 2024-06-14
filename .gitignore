@@ -1,0 +1,10 @@
+# VSCode
+.vscode
+**/*.code-workspace
+
+# Dev environment
+.prettierignore
+.prettierrc.js
+
+# macOS-specific files
+.DS_Store
