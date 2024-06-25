@@ -1,0 +1,33 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+  # To ensure we are always on the latest version
+  schedule:
+    - cron: '0 10 * * *'
+
+concurrency:
+  group: deployment-${{ github.head_ref }}
+  cancel-in-progress: true
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+jobs:
+  production:
+    environment:
+      name: production
+      url: https://newsletter.tuist.io
+    name: Production
+    env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        DOCKER_BUILDKIT: 1
+    runs-on: blacksmith-4vcpu-ubuntu-2204
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jdx/mise-action@v2
+      - name: Fly
+        run: flyctl deploy --remote-only -c fly.toml --wait-timeout 3600
